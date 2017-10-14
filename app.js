@@ -12,7 +12,13 @@ const Twitter = new twitter({
 const track = process.env.TWITTER_HANDLE;
 const AZURE_KEY = process.env.AZURE_KEY;
 const FACE_BASE_URI = process.env.FACE_BASE_URI;
-
+const getRandomImage = () => {
+  const arr = [];
+  for (let i = 1; i < 11; i++) {
+    arr.push(`https://raw.githubusercontent.com/abdulajet/Koh/master/images/${i}.jpg`);
+  }
+  return arr[Math.floor(Math.random() * arr.length)];
+}
 // You can also get the stream in a callback if you prefer.
 const stream = Twitter.stream('statuses/filter', { track });
 
@@ -43,6 +49,8 @@ const stealFace = (handle, tweetId, url) => {
   }, (err, resp, body) => {
     if (!err) {
       let faceRectangle = body[0].faceRectangle;
+      let background;
+      background = getRandomImage();
       request({
         method: 'GET',
         uri: url,
@@ -67,16 +75,15 @@ const stealFace = (handle, tweetId, url) => {
                   'Ocp-Apim-Subscription-Key': AZURE_KEY
                 },
                 body: {
-                  url: 'https://c1.staticflickr.com/4/3798/13869386723_a8ec119485_b.jpg'
+                  url: background
                 }
               }, (err, resp, body) => {
                 if (!err) {
                   console.log('3');
                   faceRectangle = body[0].faceRectangle;
-                  console.log(JSON.stringify(faceRectangle));
                   request({
                     method: 'GET',
-                    uri: 'https://c1.staticflickr.com/4/3798/13869386723_a8ec119485_b.jpg',
+                    uri: background,
                     encoding: null
                   }, (err, resp, body) => {
                     if (!err) {
