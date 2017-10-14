@@ -1,6 +1,7 @@
 require('dotenv').config()
 const Twitter = require('twitter');
 const Express = require('express');
+const fs = require('fs')
 
 const twitterUsername = "@abdulajet"
 
@@ -26,16 +27,22 @@ stream.on('error', function(error) {
 });
 
 function stealFace(handle, tweetId, img) {
-  //img as a url pls
-  reply(handle, tweetId, img)
+  //TESTING REMOVE!!!!!!!!!!!
+  let filePath = "./img.jpg";
+  let newFile = fs.readFileSync(filePath);
+
+  reply(handle, tweetId, newFile)
 }
 
 function reply(handle, tweetId, img) {
-  twitterClient.post('statuses/update', {status: `@${handle} This is an automated test ${img}`, in_reply_to_status_id: tweetId}, function(error, tweet, response) {
-    if (error) {
-      console.log(error)
-    } else {
-      console.log(tweet);
+  // Make post request on media endpoint. Pass file data as media parameter
+  twitterClient.post('media/upload', {media: img}, function(error, media, response) {
+    if (!error) {
+      twitterClient.post('statuses/update', {status: `@${handle} Here is your image!`, in_reply_to_status_id: tweetId, media_ids: media.media_id_string}, function(error, tweet, response) {
+        if (!error) {
+          console.log(tweet);
+        }
+      });
     }
   });
 }
