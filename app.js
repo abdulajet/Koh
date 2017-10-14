@@ -83,7 +83,7 @@ const stealFace = (handle, tweetId, url) => {
                       console.log('4');
                       gm(body)
                       .draw(`image Over ${faceRectangle.left},${faceRectangle.top} ${faceRectangle.width},${faceRectangle.height} "./1.jpeg"`)
-                      .write('./2.jpeg', (err) => {
+                      .toBuffer((err, buffer) => {
                         if (!err) {
                           console.log('5');
                           return reply(handle, tweetId, buffer);
