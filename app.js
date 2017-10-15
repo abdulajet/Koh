@@ -14,7 +14,7 @@ const AZURE_KEY = process.env.AZURE_KEY;
 const FACE_BASE_URI = process.env.FACE_BASE_URI;
 const getRandomImage = () => {
   const arr = [];
-  for (let i = 1; i < 11; i++) {
+  for (let i = 1; i < 10; i++) {
     arr.push(`https://raw.githubusercontent.com/abdulajet/Koh/master/images/${i}.jpg`);
   }
   return arr[Math.floor(Math.random() * arr.length)];
@@ -48,7 +48,13 @@ const stealFace = (handle, tweetId, url) => {
     }
   }, (err, resp, body) => {
     if (!err) {
-      let faceRectangle = body[0].faceRectangle;
+      let faceRectangle;
+      if (body[0] && body[0].faceRectangle) {
+        faceRectangle = body[0].faceRectangle;
+      }
+      if (!faceRectangle) {
+        return replyError(handle, tweetId);
+      }
       let background;
       background = getRandomImage();
       request({
@@ -119,6 +125,15 @@ const reply = (handle, in_reply_to_status_id, media) => {
           console.log(tweet);
         }
       });
+    }
+  });
+}
+
+const replyError = (handle, in_reply_to_status_id) => {
+  const status = `@${handle} We couldn't find your face :( Try again with a different selfie!`;
+  Twitter.post('statuses/update', { status, in_reply_to_status_id }, (error, tweet, response) => {
+    if (!error) {
+      console.log(tweet);
     }
   });
 }
